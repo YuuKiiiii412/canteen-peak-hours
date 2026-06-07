@@ -1,67 +1,61 @@
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.HashMap;
 
 public class solution {
-
-    static class HourRecord {
-        String timeSlot;
-        int students;
-
-        public HourRecord(String timeSlot, int students) {
-            this.timeSlot = timeSlot;
-            this.students = students;
-        }
-    }
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
-        int K = sc.nextInt();
 
-        HourRecord[] records = new HourRecord[N];
+        int n = sc.nextInt();
+        int k = sc.nextInt();
 
-        HashMap<String, Long> totalByTimeSlot = new HashMap<>();
+        long[] students = new long[n];
+        Map<String, Long> timeTotals = new HashMap<>();
 
-        for (int i = 0; i < N; i++) {
-
+        for (int i = 0; i < n; i++) {
             String timeSlot = sc.next();
-            int students = sc.nextInt();
+            long count = sc.nextLong();
 
-            records[i] = new HourRecord(timeSlot, students);
-
-            totalByTimeSlot.put(
-                    timeSlot,
-                    totalByTimeSlot.getOrDefault(timeSlot, 0L) + students);
+            students[i] = count;
+            timeTotals.put(timeSlot, timeTotals.getOrDefault(timeSlot, 0L) + count);
         }
 
-        long windowSum = 0;
-
-        for (int i = 0; i < K; i++) {
-            windowSum += records[i].students;
+        // Sliding Window to find the maximum sum in K consecutive hours
+        long currentSum = 0;
+        for (int i = 0; i < k; i++) {
+            currentSum += students[i];
         }
+        long maxSum = currentSum;
 
-        long maxSum = windowSum;
-
-        for (int i = K; i < N; i++) {
-            windowSum -= records[i - K].students;
-            windowSum += records[i].students;
-            if (windowSum > maxSum) {
-                maxSum = windowSum;
+        for (int i = k; i < n; i++) {
+            currentSum += students[i] - students[i - k];
+            if (currentSum > maxSum) {
+                maxSum = currentSum;
             }
         }
-        String bestSlot = null;
-        long bestTotal = -1;
 
-        for (String slot : totalByTimeSlot.keySet()) {
-            long total = totalByTimeSlot.get(slot);
-            if (total > bestTotal) {
-                bestTotal = total;
+        // Find the time slot with the highest total number of students
+        long maxSlotTotal = -1;
+        String bestSlot = "";
+
+        for (Map.Entry<String, Long> entry : timeTotals.entrySet()) {
+            String slot = entry.getKey();
+            long total = entry.getValue();
+
+            if (total > maxSlotTotal) {
+                maxSlotTotal = total;
                 bestSlot = slot;
-            } else if (total == bestTotal &&
-                    slot.compareTo(bestSlot) < 0) {
-                bestSlot = slot;
+            } else if (total == maxSlotTotal) {
+                // Handle tie-break in lexicographical order (A-Z)
+                if (bestSlot.isEmpty() || slot.compareTo(bestSlot) < 0) {
+                    bestSlot = slot;
+                }
             }
         }
+
+        // Print the results
         System.out.println(maxSum);
         System.out.println(bestSlot);
+        sc.close();
     }
 }
