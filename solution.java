@@ -7,6 +7,7 @@ public class solution {
         Scanner sc = new Scanner(System.in);
 
         int n = sc.nextInt();
+        
         int k = sc.nextInt();
 
         long[] students = new long[n];
@@ -46,14 +47,12 @@ public class solution {
                 maxSlotTotal = total;
                 bestSlot = slot;
             } else if (total == maxSlotTotal) {
-                // Handle tie-break in lexicographical order (A-Z)
                 if (bestSlot.isEmpty() || slot.compareTo(bestSlot) < 0) {
                     bestSlot = slot;
                 }
             }
         }
 
-        // Print the results
         System.out.println(maxSum);
         System.out.println(bestSlot);
         sc.close();
